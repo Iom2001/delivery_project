@@ -23,7 +23,7 @@ async def create_product(product: ProductModel, user: User = Depends(get_current
         session.commit()
         data = {
             "success": True,
-            "code": 201,
+            "code": status.HTTP_201_CREATED,
             "message": "Product created successfully",
             "data": {
                 "id": new_product.id,
@@ -42,7 +42,7 @@ async def product_list(user: User = Depends(get_current_user)):
         products = session.query(Product).all()
         data = {
             "success": True,
-            "code": 201,
+            "code": status.HTTP_201_CREATED,
             "message": "Product list successfully",
             "data": products
         }
@@ -57,7 +57,7 @@ async def product_detail(id: int, user: User = Depends(get_current_user)):
         product = session.query(Product).get(id)
         data = {
             "success": True,
-            "code": 200,
+            "code": status.HTTP_200_OK,
             "message": "Product detail successfully",
             "data": product
         }
@@ -68,12 +68,12 @@ async def product_detail(id: int, user: User = Depends(get_current_user)):
 
 @product_router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def product_delete(id: int, user: User = Depends(get_current_user)):
-    if not user or not user.is_staff:
+    if not user.is_staff:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User not allowed")
 
     product = session.query(Product).filter(Product.id == id).first()
     if product is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product topilmadi")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product is not found")
 
     session.delete(product)
     session.commit()
@@ -81,7 +81,7 @@ async def product_delete(id: int, user: User = Depends(get_current_user)):
 
 @product_router.put("/update/{id}", status_code=status.HTTP_202_ACCEPTED)
 async def product_update(id: int, update_data: ProductModel, user: User = Depends(get_current_user)):
-    if not user or not user.is_staff:
+    if not user.is_staff:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User not allowed")
 
     product = session.query(Product).filter(Product.id == id).first()
@@ -93,7 +93,7 @@ async def product_update(id: int, update_data: ProductModel, user: User = Depend
     session.commit()
     data = {
         "success": True,
-        "code": 200,
+        "code": status.HTTP_202_ACCEPTED,
         "message": "Product detail successfully",
         "data": {
             "id": product.id,

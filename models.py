@@ -1,6 +1,6 @@
 from database import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, Text, Boolean
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import relationship
 from sqlalchemy_utils.types import ChoiceType
 
 

@@ -35,18 +35,18 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, conf.authjwt_secret_key, algorithms=["HS256"])
         if payload.get("type") != "access":
-            raise HTTPException(status_code=401, detail="Only access token is allowed")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Only access token is allowed")
         username: str = payload.get("sub")
         if not username:
-            raise HTTPException(status_code=401, detail="Token not valid")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token not valid")
     except HTTPException:
         raise
     except Exception:
-        raise HTTPException(status_code=401, detail="Token is expired")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token is expired")
 
     user = session.query(User).filter(User.username == username).first()
     if not user:
-        raise HTTPException(status_code=401, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return user
 
 
@@ -131,13 +131,13 @@ async def refresh_token(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, conf.authjwt_secret_key, algorithms=["HS256"])
         if payload.get("type") != "refresh":
-            raise HTTPException(status_code=401, detail="Faqat refresh token qabul qilinadi")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Faqat refresh token qabul qilinadi")
         username: str = payload.get("sub")
         if username is None:
-            raise HTTPException(status_code=401, detail="Token yaroqsiz")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token yaroqsiz")
         db_user = session.query(User).filter(User.username == username).first()
         if db_user is None:
-            raise HTTPException(status_code=401, detail="User with this username already exists")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User with this username already exists")
         new_access_token = create_token(db_user.username, timedelta(minutes=30), "access")
         new_refresh_token = create_token(db_user.username, timedelta(days=7), "refresh")
         tokens = {
