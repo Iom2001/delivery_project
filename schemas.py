@@ -38,7 +38,7 @@ class OrderModel(BaseModel):
     quantity: int
     order_status: Optional[str] = "PENDING"
     user_id: Optional[int] = None
-    product_id: Optional[int] = None
+    product_id: int
 
     class Config:
         from_attributes = True
